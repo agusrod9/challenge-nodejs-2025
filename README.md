@@ -1,91 +1,98 @@
-# 🧪 OlaClick Backend Challenge - NestJS Edition
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-## 🎯 Objetivo
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-Diseñar e implementar una API RESTful que gestione órdenes de un restaurante utilizando el stack:
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-- **Node.js + TypeScript**
-- **NestJS (arquitectura modular y principios SOLID)**
-- **Sequelize (ORM)**
-- **PostgreSQL** como base de datos
-- **Redis** para cache
-- **Docker** para contenerización
+## Description
 
----
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## 📌 Requerimientos Funcionales
+## Project setup
 
-### 1. Listar todas las órdenes
-- Endpoint: `GET /orders`
-- Devuelve todas las órdenes con estado diferente de `delivered`.
-- Resultado cacheado en **Redis** por 30 segundos.
-
-### 2. Crear una nueva orden
-- Endpoint: `POST /orders`
-- Inserta una nueva orden en estado `initiated`.
-- Estructura esperada:
-  ```json
-  {
-    "clientName": "Ana López",
-    "items": [
-      { "description": "Ceviche", "quantity": 2, "unitPrice": 50 },
-      { "description": "Chicha morada", "quantity": 1, "unitPrice": 10 }
-    ]
-  }
-
-### 3. Avanzar estado de una orden
-Endpoint: `POST /orders/:id/advance`
-
-Progreso del estado:
-
-`initiated → sent → delivered`
-
-Si llega a `delivered`, debe eliminarse de la base de datos y del caché.
-
-### 4. Ver detalle de una orden
-Endpoint: `GET /orders/:id`
-
-Muestra la orden con todos sus detalles e items.
-
-### 🧱 Consideraciones Técnicas
-- Estructura modular con NestJS (modules, controllers, services, repositories)
-- Uso de principios SOLID
-- ORM: Sequelize con PostgreSQL
-- Uso de DTOs y Pipes para validaciones
-- Integración con Redis para cache de consultas
-- Manejo de errores estructurado (filtros de excepción, status codes)
-- Contenerización con Docker
-- Al menos una prueba automatizada con Jest (e2e o unit test)
-
-### 📦 Estructura sugerida
-```
-src/
-├── orders/
-│   ├── dto/
-│   ├── entities/
-│   ├── orders.controller.ts
-│   ├── orders.service.ts
-│   ├── orders.module.ts
-├── app.module.ts
-├── main.ts
+```bash
+$ npm install
 ```
 
-### 📘 Extras valorados
-- Uso de interceptors para logging o transformación de respuestas
-- Jobs con `@nestjs/schedule` para depuración de órdenes antiguas (bonus)
-- Uso de ConfigModule para manejar variables de entorno
+## Compile and run the project
 
-### 🚀 Entrega
-1. Haz un fork de este repositorio (o crea uno nuevo).
-2. Implementa tu solución y enviala con un push o enviandonos el enlace del repositorio publico.
-3. Incluye un README.md con:
-- Instrucciones para correr con docker o docker-compose
-- Cómo probar endpoints (Postman, Swagger, cURL)
-- Consideraciones técnicas
+```bash
+# development
+$ npm run start
 
-❓ Preguntas adicionales 
-- ¿Cómo desacoplarías la lógica de negocio del framework NestJS?
-- ¿Cómo escalarías esta API para soportar miles de órdenes concurrentes?
-- ¿Qué ventajas ofrece Redis en este caso y qué alternativas considerarías?
+# watch mode
+$ npm run start:dev
 
-¡Buena suerte y disfruta el reto! 🚀
+# production mode
+$ npm run start:prod
+```
+
+## Run tests
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
+
+## Deployment
+
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+
+```bash
+$ npm install -g @nestjs/mau
+$ mau deploy
+```
+
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+
+## Resources
+
+Check out a few resources that may come in handy when working with NestJS:
+
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+
+## Support
+
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Stay in touch
+
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
+
+## License
+
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
