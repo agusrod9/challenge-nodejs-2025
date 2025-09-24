@@ -13,6 +13,12 @@ export class OrdersController{
             return this.ordersService.createOrder(body);
     }
 
+    @Post(':id/advance')
+    async advanceOrderStatus(@Param('id') id: string){
+        return this.ordersService.advanceOrderStatus(+id)
+    }
+
+
     @Get()
     async findAll(){
         return this.ordersService.findAll();
