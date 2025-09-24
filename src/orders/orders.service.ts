@@ -4,6 +4,7 @@ import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/orderItem.entity';
 import { Op } from 'sequelize';
 import { OrderStatus } from './enums/orderStatus.enum';
+import { CreateOrderDto } from './dto/createOrder.dto';
 
 @Injectable()
 export class OrdersService {
@@ -14,10 +15,7 @@ export class OrdersService {
         private orderItemModel: typeof OrderItem,
     ) {}
 
-    async createOrder(data: {
-        clientName: string;
-        items: { description: string; quantity: number; unitPrice: number; }[];
-    }):Promise<Order> {
+    async createOrder(data: CreateOrderDto):Promise<Order> {
         const order = await this.orderModel.create(
         {
             clientName: data.clientName,
