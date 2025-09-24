@@ -3,10 +3,12 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/orderItem.entity';
 import { Op } from 'sequelize';
-import { OrderStatus } from './enums/orderStatus.enum';
+import { OrderStatus } from '../shared/enums/orderStatus.enum';
 import { CreateOrderDto } from './dto/createOrder.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
+import { DeliveredOrder } from 'src/delivered-orders/entities/deliveredOrder.entity';
+import { DeliveredOrderItem } from 'src/delivered-orders/entities/deliveredOrderItem.entity';
 
 @Injectable()
 export class OrdersService {
@@ -16,6 +18,10 @@ export class OrdersService {
         private orderModel: typeof Order,
         @InjectModel(OrderItem)
         private orderItemModel: typeof OrderItem,
+        @InjectModel(DeliveredOrder)
+        private deliveredOrderModel : typeof DeliveredOrder,
+        @InjectModel(DeliveredOrderItem)
+        private deliveredOrderItemModel : typeof DeliveredOrderItem
     ) {}
 
     async createOrder(data: CreateOrderDto):Promise<Order> {
@@ -56,7 +62,7 @@ export class OrdersService {
         if(!order){
             throw new NotFoundException(`Order with Id ${id} not found.`);
         }
-        await this.cacheManager.set(cacheKey, order, 30*1000)
+        await this.cacheManager.set(cacheKey, order, 30*1000);
         return order;
     }
 
@@ -82,7 +88,25 @@ export class OrdersService {
         }
 
         if(nextStatus== OrderStatus.D){
-            console.log("TODO: drop from Orders - insert in deliveredOrders ?? ")
+            order.status=nextStatus; // por coherencia de los datos a borrar nomás.
+            const deliveredOrder = await this.deliveredOrderModel.create({
+                ...order.get({plain: true})
+            })
+
+            for(const item of order.items){
+                await this.deliveredOrderItemModel.create({
+                    ...item.get({plain: true}),
+                    orderId: deliveredOrder.id
+                })
+            }
+            await this.cacheManager.del(`active_order_${order.id}`);
+            const activeOrdersCached = await this.cacheManager.get<Order[]>('active_orders');
+            if(activeOrdersCached){
+                const cachedOrders = activeOrdersCached as Order[];
+                const updatedActiveOrders = cachedOrders.filter((ord)=> ord.id !== id);
+                await this.cacheManager.set('active_orders',updatedActiveOrders,30*1000); //de cierta forma resetea el timer, se podría optimizar eso??
+            }
+            await order.destroy();
         }
         order.status=nextStatus;
         await order.save();

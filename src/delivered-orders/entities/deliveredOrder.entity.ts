@@ -1,19 +1,20 @@
 import { Column, Model, Table, HasMany, DataType } from "sequelize-typescript";
-import { OrderItem } from "./orderItem.entity"
+import { DeliveredOrderItem } from "./deliveredOrderItem.entity";
 import { OrderStatus } from "../../shared/enums/orderStatus.enum";
 
 @Table
-export class Order extends Model{
+export class DeliveredOrder extends Model{
     @Column
     declare clientName: string;
-
+    
     @Column({
         type: DataType.ENUM(...Object.values(OrderStatus)),
-        defaultValue: 'initiated',
+        defaultValue: 'delivered',
         allowNull: false
     })
     declare status: string;
 
-    @HasMany(()=>OrderItem)
-    declare items: OrderItem[];
+    @HasMany(()=>DeliveredOrderItem)
+    declare items: DeliveredOrderItem[]; 
+
 }

@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OrdersModule } from './orders/orders.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { CacheModule} from '@nestjs/cache-manager';
+import { DeliveredOrdersModule } from './delivered-orders/delivered-orders.module';
 import KeyvRedis from '@keyv/redis';
 
 
@@ -35,7 +36,8 @@ import KeyvRedis from '@keyv/redis';
         synchronize: true,
       }),
     }),
-    OrdersModule
+    OrdersModule,
+    DeliveredOrdersModule
   ],
   controllers: [AppController],
   providers: [AppService],
