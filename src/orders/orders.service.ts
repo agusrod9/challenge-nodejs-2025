@@ -1,14 +1,17 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/orderItem.entity';
 import { Op } from 'sequelize';
 import { OrderStatus } from './enums/orderStatus.enum';
 import { CreateOrderDto } from './dto/createOrder.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class OrdersService {
     constructor(
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
         @InjectModel(Order)
         private orderModel: typeof Order,
         @InjectModel(OrderItem)
@@ -27,6 +30,11 @@ export class OrdersService {
     }
 
     async findAll():Promise<Order[]>{
+        const cacheKey = 'active_orders';
+        const cached = await this.cacheManager.get<Order[]>(cacheKey);
+        if(cached){
+            return cached;
+        }
         const orders = await this.orderModel.findAll({
             where: {
                 status: {[Op.ne]: 'delivered'},
@@ -34,14 +42,21 @@ export class OrdersService {
             include: [OrderItem],
             order: [['createdAt', 'DESC']],
         });
+        await this.cacheManager.set(cacheKey, orders, 30*1000); 
         return orders;
     }
 
     async findById(id: number):Promise<Order>{
+        const cacheKey = `active_order_${id}`;
+        const cached = await this.cacheManager.get<Order>(cacheKey);
+        if(cached){
+            return cached;
+        }
         const order = await this.orderModel.findByPk(id, {include: [OrderItem]});
         if(!order){
             throw new NotFoundException(`Order with Id ${id} not found.`);
         }
+        await this.cacheManager.set(cacheKey, order, 30*1000)
         return order;
     }
 

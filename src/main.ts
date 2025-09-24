@@ -8,6 +8,6 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') ?? 8082;
   app.useGlobalPipes(new ValidationPipe({whitelist: true, forbidNonWhitelisted: true}));
-  await app.listen(port, ()=>console.log(`Service running on port ${port}`));
+  await app.listen(port, ()=>console.log(`Server running on port ${port}`));
 }
 bootstrap();
