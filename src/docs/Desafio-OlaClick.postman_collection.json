@@ -1,0 +1,110 @@
+{
+	"info": {
+		"_postman_id": "cc2bdd4b-05fa-42c3-a3e9-23fc090cf105",
+		"name": "Desafio-OlaClick",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36556236"
+	},
+	"item": [
+		{
+			"name": "Order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientName\" : \"Agustín R.\",\r\n    \"items\" : [\r\n        {\r\n            \"description\" : \"Milanesa con guarnición.\",\r\n            \"quantity\" : 1,\r\n            \"unitPrice\" : 1100\r\n        },\r\n        {\r\n            \"description\" : \"Agua Mineral 1.5L\",\r\n            \"quantity\" : 1,\r\n            \"unitPrice\" : 100\r\n        },\r\n        {\r\n            \"description\" : \"Helado menta granizada 400g\",\r\n            \"quantity\" : 1,\r\n            \"unitPrice\" : 250\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/orders",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AdvanceOrder",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientName\" : \"Ulysse L\",\r\n    \"items\" : [\r\n        {\r\n            \"description\" : \"Agua Mineral 1L\",\r\n            \"quantity\" : 1,\r\n            \"unitPrice\" : 65\r\n        },\r\n        {\r\n            \"description\" : \"Croque-Monsieur\",\r\n            \"quantity\" : 1,\r\n            \"unitPrice\" : 220\r\n        },\r\n        {\r\n            \"description\" : \"Macarons\",\r\n            \"quantity\" : 3,\r\n            \"unitPrice\" : 90\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/orders/1/advance",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"1",
+						"advance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All-Orders",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:3000/orders",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order-By-Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/orders/1",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

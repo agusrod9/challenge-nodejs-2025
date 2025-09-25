@@ -1,98 +1,177 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Desafío OlaClick — Backend (NestJS)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Descripción
+--------------
+API REST para gestionar órdenes de un restaurante. Implementada en **Node.js + TypeScript** con **NestJS**, **Sequelize (Postgres)**, **Redis** y **Docker / docker-compose**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Contenido del README
+1. Quick start
+2. Ejecutar local
+3. Variables de entorno
+4. Endpoints
+5. Cómo probar 
+6. Tests 
+7. Consideraciones técnicas
+8. Comportamiento del cache
+9. Preguntas adicionales
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 1) Quick start
+### Requisitos
+- Docker
+- Docker-Compose
 
+### Pasos
+1. Clonar el repo:
 ```bash
-$ npm install
+git clone https://github.com/agusrod9/challenge-nodejs-2025.git
+cd challenge-nodejs-2025
+```
+2. Copiar el archivo de ejemplo de variables de entorno y editar valores con los enviados por mail:
+```bash
+cp .env.example .env
+```
+3. Levantar con docker-compose:
+```bash
+docker-compose up --build
+```
+4. La API quedará expuesta en `http://localhost:<3000> desde Docker`
+
+> Observación: `docker-compose` levanta 3 servicios: `orders_api`, `order_db` y `order_redis`. 
+
+---
+
+## 2) Ejecutar local
+1. Instalar dependencias:
+```bash
+npm install
+```
+2. Copiar el archivo de ejemplo de variables de entorno y editar valores con los enviados por mail:
+```bash
+cp .env.example .env
+```
+3. Ejecutar:
+```bash
+npm run start
 ```
 
-## Compile and run the project
+---
 
+## 3) Variables de entorno
+Fueron enviadas por mail, se deja env.example como guía.
+
+---
+
+## 4) Endpoints (principales)
+
+
+### GET /orders
+Lista todas las órdenes (incluye `items`) con estado distinto de `delivered`.
+- Cacheado en Redis por **30 segundos**.
+
+**Ejemplo cURL**:
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+curl -X GET "http://localhost:3000/orders"
 ```
 
-## Run tests
+---
+
+### GET /orders/:id
+Devuelve los detalles de una orden (incluye `items`).
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+curl -X GET "http://localhost:3000/orders/1"
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### POST /orders
+Crea una nueva orden en estado `initiated`.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+**Payload**:
+```json
+{
+  "clientName": "Ana López",
+  "items": [
+    { "description": "Ceviche", "quantity": 2, "unitPrice": 50 },
+    { "description": "Chicha morada", "quantity": 1, "unitPrice": 10 }
+  ]
+}
+```
+
+**Ejemplo cURL**:
+```bash
+curl -X POST "http://localhost:3000/orders" \
+  -H "Content-Type: application/json" \
+  -d '{"clientName":"Ana López","items":[{"description":"Ceviche","quantity":2,"unitPrice":50}] }'
+```
+
+> Validaciones: `CreateOrderDto` valida `clientName` y cada `item` mediante `class-validator`.
+
+---
+
+### POST /orders/:id/advance
+Avanza el estado de la orden: `initiated` → `sent` → `delivered`.
+- Si al avanzar llega a `delivered`, la orden se **elimina de la tabla Orders y del cache**.
+- También incluí **la tabla DeliveredOrders** a modo de mantener un histórico de ordenes entregadas.
+- Al eliminarse de **Orders** se persiste en **DeliveredOrders** junto con sus **OrderItems** correspondientes en **DeliveredOrderItems** para persistir esos items independientemente del mantenimiento de la tabla **OrderItems**.
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl -X POST "http://localhost:3000/orders/1/advance"
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 5) Cómo probar
+- **Postman**: Descargar proyecto Postman --> [`Desafio-OlaClick.postman_collection.json`](src/docs/Desafio-OlaClick.postman_collection.json) 
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 6) Tests
+- Ejecutar test unitario sobre **OrdersController**:
+```bash
+npm run test
+```
 
-## Support
+> Ejecuta 
+```bash 
+jest src/orders/orders.controller.spec.ts
+```
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 7) Consideraciones técnicas
+- **Arquitectura**: NestJS modular, controllers, services y entidades. Sigue principios SOLID y separación de responsabilidades.
+- **DB**: PostgreSQL con Sequelize. En desarrollo se usa `synchronize: true` para facilitar las pruebas.
+- **Cache**: Redis para cachear `GET /orders` y `GET /orders/:id` por 30s y reducir las invocaciones a la API.
+- **Validación**: DTOs con `class-validator` + `ValidationPipe` global para prevenir requests inválidos.
+- **Manejo de errores**: excepciones controladas con filtros.
+- **Contenerización**: `Dockerfile` para la API + `docker-compose` para integrar API, Postgres y Redis.
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 8) Comportamiento del cache
+- `GET /orders` y `GET /orders/:id` consultan primero Redis. Si hay dato, lo devuelven. Si no, van a la DB y luego setean la clave con TTL 30 segundos.
+- Cuando una orden llega a `delivered` se elimina de la DB, persistiéndola en tabla **DeliveredOrders** y también se asegura la limpieza del cache.
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 9) Preguntas adicionales
+- ¿Cómo desacoplarías la lógica de negocio del framework NestJS?
+
+    **Yo separaría principalmente la lógica de negocio en servicios puros, podría llamarlos desde los controllers de Nest y de esta forma seguiría funcionando como hasta ahora, pero si quisiera cambiar de framework por ejemplo, podría utilizar los mismos servicios desde el nuevo y obtendría el mismo comportamiento.**
+    
+- ¿Cómo escalarías esta API para soportar miles de órdenes concurrentes?
+
+    **Yo correría varias instancias en contenedores y utilizaría por ejemplo Kubernetes para balancear la carga. Con Redis ya estaría "ahorrando" algunas llamadas a la base. La base se podría indexar y replicar con un pool de conexiones. Y la API al impactar todo en Redis o la base, podría tener muchas instancias atendiendo clientes indistintamente sin afectar los datos.**
+
+- ¿Qué ventajas ofrece Redis en este caso y qué alternativas considerarías?
+
+    **Lo que me pareció útil de Redis es que puedo aumentar velocidad de respuesta a la vez que disminuyo invocaciones a la base, no lo había utilizado antes y la verdad me pareció muy útil para algunas cosas que no son tan volátiles y puedo mantenerlas un tiempo prudencial en memoria del Server. Alternativas no conozco y de lo que pude averiguar la verdad Redis me parece lo mejor para este caso ya que por ejemplo me permite persistir estructuras complejas como un Array de Orders como ejemplo.**
+
+---
+
+## Contacto
+Enviarme un [E-Mail](mailto:agusrod9@gmail.com).
